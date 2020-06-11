@@ -1,3 +1,5 @@
+require 'xcodeproj'
+
 module Pod
   class MessageBank
     attr_reader :configurator
@@ -64,6 +66,26 @@ module Pod
       puts " Ace! you're ready to go!"
       puts " We will start you off by opening your project in Xcode"
       pod_name = @configurator.pod_name
+
+      puts "Installing new xcodeproj..."
+      project = Xcodeproj::Project.new("Example/DevelopmentPods/DevelopmentPods.xcodeproj")
+
+      # puts "objects: "
+      # puts project.objects
+      # puts project.objects.select{ |x| 
+      #   puts "inside"
+      #   puts x.class
+      #   puts x
+      #   x.class == Xcodeproj::Project::Object::PBXFrameworksBuildPhase
+      # }
+      # puts Xcodeproj::Project::Object::PBXFrameworksBuildPhase
+      # framework_buildphase = project.objects.select{|x| x == Products}
+      # framework_buildphase.add_file_reference(libRef)
+      project.save()
+      puts "Xcodeproj successfully created."
+
+      ws = Xcodeproj::Project.open("Example/#{pod_name}.xcworkspace")
+      ws.add_file_reference(project)
       run_command "open 'Example/#{pod_name}.xcworkspace'", "open '#{pod_name}/Example/#{pod_name}.xcworkspace'"
     end
 
