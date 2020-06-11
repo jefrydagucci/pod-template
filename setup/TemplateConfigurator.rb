@@ -95,6 +95,7 @@ module Pod
       rename_classes_folder
       ensure_carthage_compatibility
       reinitialize_git_repo
+      create_development_pods_project
       run_pod_install
 
       @message_bank.farewell_message
@@ -230,7 +231,7 @@ module Pod
                 new_folder = File.basename(item)
                 created_group = current_group.new_group(new_folder)
                 changed = addfiles("#{item}/*", created_group, main_target, changed)
-            else 
+            else
               i = current_group.new_file(item)
               if item.include? ".swift"
                   main_target.add_file_references([i])
@@ -258,13 +259,12 @@ module Pod
     end
 
     def create_development_pods_project
-
       puts "Installing new xcodeproj..."
       project = Xcodeproj::Project.new("Example/DevelopmentPods/DevelopmentPods.xcodeproj")
 
       # puts "objects: "
       # puts project.objects
-      # puts project.objects.select{ |x| 
+      # puts project.objects.select{ |x|
       #   puts "inside"
       #   puts x.class
       #   puts x
@@ -275,6 +275,11 @@ module Pod
       # framework_buildphase.add_file_reference(libRef)
       project.save()
       puts "Xcodeproj successfully created."
+
+      ws_name = "Example/#{pod_name}.xcworkspace"
+      project_workspace = Xcodeproj::Workspace.new_from_xcworkspace(ws_name)
+
+      project_workspace.add_group(project.path)
     end
 
     #----------------------------------------#
